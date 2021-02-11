@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-variable "org_id" {
-  description = "organization id"
-}
 
 variable "service_project_id" {
   description = "The ID of the service project which hosts the project resources e.g. dev-55427"
@@ -24,6 +21,9 @@ variable "service_project_id" {
 
 variable "shared_vpc_host_project_id" {
   description = "The ID of the host project which hosts the shared VPC e.g. shared-vpc-host-project-55427"
+}
+
+variable "registry_project_id" {
 }
 
 variable "shared_vpc_network" {
@@ -38,12 +38,17 @@ variable "subnet_region" {
   description = "region subnet is located in"
 }
 
+variable "create_subnet" {
+  default = true
+}
+
 variable "gke_cluster_name" {
   description = "gke cluster name"
 }
 
 variable "gke_cluster_location" {
   description = "cluster location, either a region or a zone"
+  default = "us-central1-c"
 }
 
 variable "gke_cluster_master_range" {
@@ -56,6 +61,14 @@ variable "gke_subnet_pods_range_name" {
 
 variable "gke_subnet_services_range_name" {
     default = "services"
+}
+
+variable "subnet_primary_range" {
+
+}
+
+variable "subnet_secondary_range" {
+  type = map(any)
 }
 
 variable "gke_default_nodepool_initial_size" {
