@@ -28,6 +28,7 @@ resource "google_compute_subnetwork" "subnet" {
 */
 
 resource "google_service_account" "gke_sa" {
+  count = var.create_gke ? 1 : 0
   project = data.google_project.service_project.project_id
   account_id = format("%s-sa", var.gke_cluster_name)
   display_name = format("%s cluster service account", var.gke_cluster_name)
@@ -35,50 +36,25 @@ resource "google_service_account" "gke_sa" {
 
 
 resource "google_compute_subnetwork_iam_member" "gke_sa_network_user" {
+  count = var.create_gke ? 1 : 0
   project = data.google_project.host_project.project_id
   region = var.subnet_region
   subnetwork = local.subnet_name
   role = "roles/compute.networkUser"
-  member = format("serviceAccount:%s", google_service_account.gke_sa.email)
+  member = format("serviceAccount:%s", google_service_account.gke_sa[0].email)
 }
 
 resource "google_project_iam_member" "gke_sa_role" {
-  count = length(local.gke_sa_roles)
+  count = var.create_gke ? length(local.gke_sa_roles) : 0
   project = data.google_project.service_project.project_id
   role = element(local.gke_sa_roles, count.index) 
-  member = format("serviceAccount:%s", google_service_account.gke_sa.email)
+  member = format("serviceAccount:%s", google_service_account.gke_sa[0].email)
 }
 
-resource "google_compute_subnetwork_iam_member" "cloudservices_network_user" {
-  project = data.google_project.host_project.project_id
-  region = var.subnet_region
-  subnetwork = local.subnet_name
-  role = "roles/compute.networkUser"
-  member = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
-}
-
-resource "google_project_iam_member" "cloudservices_host_service_agent" {
-  project = data.google_project.host_project.project_id
-  role = "roles/container.hostServiceAgentUser"
-  member = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
-}
-
-resource "google_compute_subnetwork_iam_member" "container_network_user" {
-  project = data.google_project.host_project.project_id
-  region = var.subnet_region
-  subnetwork = local.subnet_name
-  role = "roles/compute.networkUser"
-  member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
-}
-
-resource "google_project_iam_member" "container_host_service_agent" {
-  project = data.google_project.host_project.project_id
-  role = "roles/container.hostServiceAgentUser"
-  member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
-}
 
 
 resource "google_container_cluster" "primary" {
+  count = var.create_gke ? 1 : 0
   provider = google
 
   lifecycle {
@@ -131,7 +107,7 @@ resource "google_container_cluster" "primary" {
       disable-legacy-endpoints = "true"
     }
 
-    service_account = google_service_account.gke_sa.email
+    service_account = google_service_account.gke_sa[0].email
     oauth_scopes    = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
@@ -170,9 +146,10 @@ resource "google_container_cluster" "primary" {
 }
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
+  count      = var.create_gke ? 1 : 0
   name       = format("%s-default-pvm", var.gke_cluster_name)
   location   = var.gke_cluster_location
-  cluster    = google_container_cluster.primary.name
+  cluster    = google_container_cluster.primary[0].name
   node_count = var.gke_default_nodepool_initial_size
   project    = var.service_project_id
 
@@ -193,7 +170,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
       node_metadata = "GKE_METADATA_SERVER"
     }
 
-    service_account = google_service_account.gke_sa.email
+    service_account = google_service_account.gke_sa[0].email
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]

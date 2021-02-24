@@ -27,9 +27,69 @@ resource "google_compute_subnetwork" "subnet" {
   }
 }
 
+resource "google_compute_subnetwork" "additional_subnet" {
+  count         = var.create_subnet ? length(var.additional_subnets) : 0
+  name          = var.additional_subnets[count.index].name
+  ip_cidr_range = var.additional_subnets[count.index].primary_range
+  region        = var.additional_subnets[count.index].region
+  project       = data.google_project.host_project.project_id
+  network       = data.google_compute_network.shared_vpc.name
+
+  private_ip_google_access = true
+}
+
 data "google_compute_subnetwork" "subnet" {
   count         = var.create_subnet ? 0 : 1
   name          = var.subnet_name
   region        = var.subnet_region
   project       = data.google_project.host_project.project_id
 }
+
+
+
+resource "google_project_iam_member" "cloudservices_host_service_agent" {
+  project = data.google_project.host_project.project_id
+  role = "roles/container.hostServiceAgentUser"
+  member = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
+}
+
+resource "google_project_iam_member" "container_host_service_agent" {
+  project = data.google_project.host_project.project_id
+  role = "roles/container.hostServiceAgentUser"
+  member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
+}
+
+resource "google_compute_subnetwork_iam_member" "cloudservices_network_user" {
+  project = data.google_project.host_project.project_id
+  region = var.subnet_region
+  subnetwork = local.subnet_name
+  role = "roles/compute.networkUser"
+  member = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
+}
+
+resource "google_compute_subnetwork_iam_member" "container_network_user" {
+  project = data.google_project.host_project.project_id
+  region = var.subnet_region
+  subnetwork = local.subnet_name
+  role = "roles/compute.networkUser"
+  member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
+}
+
+resource "google_compute_subnetwork_iam_member" "container_network_user_additional" {
+  count       = var.create_subnet ? length(var.additional_subnets) : 0
+  project     = data.google_project.host_project.project_id
+  region      = google_compute_subnetwork.additional_subnet[count.index].region
+  subnetwork  = google_compute_subnetwork.additional_subnet[count.index].name
+  role        = "roles/compute.networkUser"
+  member      = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
+}
+
+resource "google_compute_subnetwork_iam_member" "cloudservices_network_user_additional" {
+  count       = var.create_subnet ? length(var.additional_subnets) : 0
+  project     = data.google_project.host_project.project_id
+  region      = google_compute_subnetwork.additional_subnet[count.index].region
+  subnetwork  = google_compute_subnetwork.additional_subnet[count.index].name
+  role        = "roles/compute.networkUser"
+  member      = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
+}
+

@@ -42,6 +42,28 @@ variable "create_subnet" {
   default = true
 }
 
+variable "create_gke" {
+  default = true
+}
+
+variable "subnet_primary_range" {
+
+}
+
+variable "subnet_secondary_range" {
+  type = map(any)
+  default = {}
+}
+
+variable "additional_subnets" {
+  type = list(object({
+    name=string,
+    region=string,
+    primary_range=string,
+  }))
+  default = []
+}
+
 variable "gke_cluster_name" {
   description = "gke cluster name"
 }
@@ -63,13 +85,6 @@ variable "gke_subnet_services_range_name" {
     default = "services"
 }
 
-variable "subnet_primary_range" {
-
-}
-
-variable "subnet_secondary_range" {
-  type = map(any)
-}
 
 variable "gke_default_nodepool_initial_size" {
     default = 1
