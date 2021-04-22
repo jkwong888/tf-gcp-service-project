@@ -6,20 +6,14 @@ data "google_project" "service_project" {
   project_id = var.service_project_id
 }
 
-locals {
-  apis_to_enable = [
-    "container.googleapis.com",
-    "compute.googleapis.com",
-  ]
-}
 
 resource "google_project_service" "service_project_computeapi" {
   lifecycle {
 
   }
-  count                      = length(local.apis_to_enable)
+  count                      = length(var.service_project_apis_to_enable)
   project                    = data.google_project.service_project.project_id
-  service                    = element(local.apis_to_enable, count.index)
+  service                    = element(var.service_project_apis_to_enable, count.index)
   disable_on_destroy         = false
   disable_dependent_services = false
 }

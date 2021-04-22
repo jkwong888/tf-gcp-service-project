@@ -36,6 +36,17 @@ resource "google_compute_subnetwork" "additional_subnet" {
   network       = data.google_compute_network.shared_vpc.name
 
   private_ip_google_access = true
+
+  /*
+  dynamic "secondary_ip_range" {
+    for_each = var.additional_subnets[count.index].subnet_secondary_range
+    content {
+      range_name    = secondary_ip_range.key
+      ip_cidr_range = secondary_ip_range.value
+    }
+  }
+  */
+
 }
 
 data "google_compute_subnetwork" "subnet" {
@@ -54,6 +65,9 @@ resource "google_project_iam_member" "cloudservices_host_service_agent" {
 }
 
 resource "google_project_iam_member" "container_host_service_agent" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
   project = data.google_project.host_project.project_id
   role = "roles/container.hostServiceAgentUser"
   member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
@@ -68,6 +82,10 @@ resource "google_compute_subnetwork_iam_member" "cloudservices_network_user" {
 }
 
 resource "google_compute_subnetwork_iam_member" "container_network_user" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
   project = data.google_project.host_project.project_id
   region = var.subnet_region
   subnetwork = local.subnet_name
@@ -75,7 +93,25 @@ resource "google_compute_subnetwork_iam_member" "container_network_user" {
   member = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", data.google_project.service_project.number)
 }
 
+resource "google_compute_subnetwork_iam_member" "additional_subnet_user" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
+  count = length(var.subnet_users)
+  project = data.google_project.host_project.project_id
+  region = var.subnet_region
+  subnetwork = local.subnet_name
+  role = "roles/compute.networkUser"
+  member = format("serviceAccount:%s", var.subnet_users[count.index])
+
+}
+
 resource "google_compute_subnetwork_iam_member" "container_network_user_additional" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
   count       = var.create_subnet ? length(var.additional_subnets) : 0
   project     = data.google_project.host_project.project_id
   region      = google_compute_subnetwork.additional_subnet[count.index].region
@@ -85,6 +121,10 @@ resource "google_compute_subnetwork_iam_member" "container_network_user_addition
 }
 
 resource "google_compute_subnetwork_iam_member" "cloudservices_network_user_additional" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
   count       = var.create_subnet ? length(var.additional_subnets) : 0
   project     = data.google_project.host_project.project_id
   region      = google_compute_subnetwork.additional_subnet[count.index].region

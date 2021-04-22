@@ -26,6 +26,14 @@ variable "shared_vpc_host_project_id" {
 variable "registry_project_id" {
 }
 
+variable "service_project_apis_to_enable" {
+  type = list(string)
+  default = [
+    "container.googleapis.com",
+    "compute.googleapis.com",
+  ]
+}
+
 variable "shared_vpc_network" {
   description = "The ID of the shared VPC e.g. shared-network"
 }
@@ -40,6 +48,11 @@ variable "subnet_region" {
 
 variable "create_subnet" {
   default = true
+}
+
+variable "subnet_users" {
+  type = list(string)
+  default = []
 }
 
 variable "create_gke" {
