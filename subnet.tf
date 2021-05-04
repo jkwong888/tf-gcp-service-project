@@ -59,6 +59,10 @@ data "google_compute_subnetwork" "subnet" {
 
 
 resource "google_project_iam_member" "cloudservices_host_service_agent" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
   project = data.google_project.host_project.project_id
   role = "roles/container.hostServiceAgentUser"
   member = format("serviceAccount:%d@cloudservices.gserviceaccount.com", data.google_project.service_project.number)
@@ -74,6 +78,10 @@ resource "google_project_iam_member" "container_host_service_agent" {
 }
 
 resource "google_compute_subnetwork_iam_member" "cloudservices_network_user" {
+  depends_on = [
+    google_project_service.service_project_computeapi
+  ]
+
   project = data.google_project.host_project.project_id
   region = var.subnet_region
   subnetwork = local.subnet_name
