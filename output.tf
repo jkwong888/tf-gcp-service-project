@@ -10,6 +10,6 @@ output "enabled_apis" {
     value = google_project_service.service_project_api[*].service
 }
 
-output "subnet_ids" {
-    value = google_compute_subnetwork.subnet[*].id
+output "subnets" {
+    value = google_compute_subnetwork.subnet
 }
