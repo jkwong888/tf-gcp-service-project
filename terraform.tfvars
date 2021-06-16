@@ -2,9 +2,7 @@
 
 shared_vpc_host_project_id = "jkwng-nonprod-vpc"
 shared_vpc_network = "shared-vpc-nonprod-1"
-
 project_id = "jkwng-fruitshop-dev"
-registry_project_id = "jkwng-images"
 
 subnets = [
 {
@@ -36,7 +34,7 @@ subnets = [
   },
 ]
 
-service_project_apis_to_enable = [
+apis_to_enable = [
     "compute.googleapis.com",
     "container.googleapis.com",
     "multiclusteringress.googleapis.com",
