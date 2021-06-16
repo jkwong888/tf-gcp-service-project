@@ -25,7 +25,7 @@ resource "google_compute_subnetwork" "subnet" {
 
 resource "google_compute_subnetwork_iam_member" "subnet_user" {
   depends_on = [
-    module.service_project.enabled_apis
+    google_project_service.service_project_api,
   ]
 
   count       = length(var.subnet_users) * length(var.subnets)
@@ -38,7 +38,7 @@ resource "google_compute_subnetwork_iam_member" "subnet_user" {
 
 resource "google_compute_subnetwork_iam_member" "container_network_user_additional" {
   depends_on = [
-    module.service_project.enabled_apis
+    google_project_service.service_project_api,
   ]
 
   count       = length(var.subnets)
@@ -46,12 +46,12 @@ resource "google_compute_subnetwork_iam_member" "container_network_user_addition
   region      = google_compute_subnetwork.subnet[count.index].region
   subnetwork  = google_compute_subnetwork.subnet[count.index].name
   role        = "roles/compute.networkUser"
-  member      = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", module.service_project.number)
+  member      = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", local.project_number)
 }
 
 resource "google_compute_subnetwork_iam_member" "cloudservices_network_user_additional" {
   depends_on = [
-    module.service_project.enabled_apis
+    google_project_service.service_project_api,
   ]
 
   count       = length(var.subnets) 
@@ -59,6 +59,6 @@ resource "google_compute_subnetwork_iam_member" "cloudservices_network_user_addi
   region      = google_compute_subnetwork.subnet[count.index].region
   subnetwork  = google_compute_subnetwork.subnet[count.index].name
   role        = "roles/compute.networkUser"
-  member      = format("serviceAccount:%d@cloudservices.gserviceaccount.com", module.service_project.number)
+  member      = format("serviceAccount:%d@cloudservices.gserviceaccount.com", local.project_number)
 }
 

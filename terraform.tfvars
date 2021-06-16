@@ -3,12 +3,8 @@
 shared_vpc_host_project_id = "jkwng-nonprod-vpc"
 shared_vpc_network = "shared-vpc-nonprod-1"
 
-service_project_id = "jkwng-fruitshop-dev"
+project_id = "jkwng-fruitshop-dev"
 registry_project_id = "jkwng-images"
-
-gke_cluster_name = "fruitshop-dev-central"
-gke_cluster_master_range = "10.0.2.0/28"
-gke_default_nodepool_machine_type = "e2-standard-2"
 
 subnets = [
 {
