@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
-    bucket  = "jkwng-workshop-ongcp-co-tfstate"
-    prefix = "jkwng-tf-service-project-gke"
+    bucket  = "jkwng-altostrat-com-tf-state"
+    prefix = "jkwng-terraform-service-project"
   }
 
   required_providers {

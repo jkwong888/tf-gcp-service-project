@@ -39,11 +39,13 @@ variable "shared_vpc_network" {
 }
 
 variable "subnet_name" {
-  description = "Name of subnet to create"
+  description = "Name of subnet to use"
+  default = ""
 }
 
 variable "subnet_region" {
   description = "region subnet is located in"
+  default = ""
 }
 
 variable "create_subnet" {
@@ -60,7 +62,7 @@ variable "create_gke" {
 }
 
 variable "subnet_primary_range" {
-
+  default = ""
 }
 
 variable "subnet_secondary_range" {
@@ -73,6 +75,7 @@ variable "additional_subnets" {
     name=string,
     region=string,
     primary_range=string,
+    secondary_range=map(any)
   }))
   default = []
 }
@@ -112,7 +115,7 @@ variable "gke_default_nodepool_max_size" {
 }
 
 variable "gke_default_nodepool_machine_type" {
-    default = "e2-standard-4"
+    default = "e2-standard-2"
 }
 
 variable "gke_use_preemptible_nodes" {
