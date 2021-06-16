@@ -2,29 +2,23 @@ data "google_project" "host_project" {
   project_id = var.shared_vpc_host_project_id
 }
 
-data "google_project" "service_project" {
-  project_id = var.service_project_id
+module "service_project" {
+  source = "./project"
+
+  org_id              = var.organization_id
+  billing_account_id  = var.billing_account_id
+  project_id          = var.service_project_id
+  parent_folder_id    = var.service_project_parent_folder_id
+
+  apis_to_enable      = var.service_project_apis_to_enable
 }
-
-
-resource "google_project_service" "service_project_computeapi" {
-  lifecycle {
-
-  }
-  count                      = length(var.service_project_apis_to_enable)
-  project                    = data.google_project.service_project.project_id
-  service                    = element(var.service_project_apis_to_enable, count.index)
-  disable_on_destroy         = false
-  disable_dependent_services = false
-}
-
 
 resource "google_compute_shared_vpc_service_project" "shared_vpc_attachment" {
   host_project    = data.google_project.host_project.project_id
-  service_project = data.google_project.service_project.project_id
+  service_project = module.service_project.project_id
 
   depends_on = [
-    google_project_service.service_project_computeapi,
+    module.service_project.enabled_apis,
   ]
 }
 

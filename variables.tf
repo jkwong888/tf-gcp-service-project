@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
+variable "billing_account_id" {
+  default = ""
+}
+
+variable "organization_id" {
+  default = "614120287242" // jkwng.altostrat.com
+}
+
+variable "service_project_parent_folder_id" {
+  default = "297737034934" // dev
+}
 
 variable "service_project_id" {
   description = "The ID of the service project which hosts the project resources e.g. dev-55427"
@@ -38,20 +49,6 @@ variable "shared_vpc_network" {
   description = "The ID of the shared VPC e.g. shared-network"
 }
 
-variable "subnet_name" {
-  description = "Name of subnet to use"
-  default = ""
-}
-
-variable "subnet_region" {
-  description = "region subnet is located in"
-  default = ""
-}
-
-variable "create_subnet" {
-  default = true
-}
-
 variable "subnet_users" {
   type = list(string)
   default = []
@@ -61,16 +58,7 @@ variable "create_gke" {
   default = true
 }
 
-variable "subnet_primary_range" {
-  default = ""
-}
-
-variable "subnet_secondary_range" {
-  type = map(any)
-  default = {}
-}
-
-variable "additional_subnets" {
+variable "subnets" {
   type = list(object({
     name=string,
     region=string,
