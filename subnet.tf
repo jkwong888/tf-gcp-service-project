@@ -33,7 +33,7 @@ resource "google_compute_subnetwork_iam_member" "subnet_user" {
   region      = google_compute_subnetwork.subnet[count.index % length(var.subnet_users)].region
   subnetwork  = google_compute_subnetwork.subnet[count.index % length(var.subnet_users)].name
   role        = "roles/compute.networkUser"
-  member      = format("serviceAccount:%s", var.subnet_users[count.index % length(var.subnets)])
+  member      = format("serviceAccount:%s", var.subnet_users[floor(count.index / length(var.subnets))])
 }
 
 resource "google_compute_subnetwork_iam_member" "container_network_user_additional" {
