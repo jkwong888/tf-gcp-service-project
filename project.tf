@@ -30,6 +30,8 @@ resource "google_project" "service_project" {
     folder_id           = data.google_folder.parent_folder[0].id
     billing_account     = data.google_billing_account.acct[0].billing_account
     auto_create_network =  false
+
+    skip_delete         = var.skip_delete
 }
 
 data "google_project" "service_project" {
@@ -55,3 +57,12 @@ resource "google_compute_shared_vpc_service_project" "shared_vpc_attachment" {
   ]
 }
 
+resource "google_project_iam_member" "gkeHostServiceAgentUser" {
+  depends_on = [
+    google_project_service.service_project_api,
+  ]
+
+  project     = data.google_project.host_project.project_id
+  role        = "roles/container.hostServiceAgentUser"
+  member      = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", local.project_number)
+}

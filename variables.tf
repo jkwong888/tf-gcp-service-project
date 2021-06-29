@@ -42,6 +42,10 @@ variable "apis_to_enable" {
   ]
 }
 
+variable "skip_delete" {
+  default = true
+}
+
 variable "shared_vpc_network" {
   description = "The ID of the shared VPC e.g. shared-network"
 }
