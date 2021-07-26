@@ -1,10 +1,10 @@
 terraform {
   required_providers {
     google = {
-      version = "~> 3.72.0"
+      version = ">= 3.72.0"
     }
     google-beta = {
-      version = "~> 3.72.0"
+      version = ">= 3.72.0"
 
     }
     null = {
