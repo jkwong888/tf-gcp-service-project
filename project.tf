@@ -56,13 +56,3 @@ resource "google_compute_shared_vpc_service_project" "shared_vpc_attachment" {
     google_project_service.service_project_api,
   ]
 }
-
-resource "google_project_iam_member" "gkeHostServiceAgentUser" {
-  depends_on = [
-    google_project_service.service_project_api,
-  ]
-
-  project     = data.google_project.host_project.project_id
-  role        = "roles/container.hostServiceAgentUser"
-  member      = format("serviceAccount:service-%d@container-engine-robot.iam.gserviceaccount.com", local.project_number)
-}
