@@ -21,7 +21,3 @@ output "subnet_users" {
         google_compute_subnetwork_iam_member.cloudservices_network_user_additional.*.member,
     )
 }
-
-output "hostServiceAgentUser" {
-    value = google_project_iam_member.gkeHostServiceAgentUser.member
-}
