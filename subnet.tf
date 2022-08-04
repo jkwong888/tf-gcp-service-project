@@ -1,4 +1,5 @@
 data "google_compute_network" "shared_vpc" {
+  count = length(var.subnets) > 0 ? 1 : 0
   name    =  var.shared_vpc_network
   project = data.google_project.host_project.project_id
 }
@@ -10,7 +11,7 @@ resource "google_compute_subnetwork" "subnet" {
   ip_cidr_range = var.subnets[count.index].primary_range
   region        = var.subnets[count.index].region
   project       = data.google_project.host_project.project_id
-  network       = data.google_compute_network.shared_vpc.name
+  network       = data.google_compute_network.shared_vpc[0].name
 
   private_ip_google_access = true
 

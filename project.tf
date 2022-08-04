@@ -49,6 +49,7 @@ resource "google_project_service" "service_project_api" {
 }
 
 resource "google_compute_shared_vpc_service_project" "shared_vpc_attachment" {
+  count           = length(var.subnets) > 0 ? 1 : 0
   host_project    = data.google_project.host_project.project_id
   service_project = local.project_id
 
