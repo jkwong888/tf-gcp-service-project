@@ -18,8 +18,8 @@ data "google_billing_account" "acct" {
 }
 
 data "google_folder" "parent_folder" {
-    count = var.billing_account_id != "" ? 1 : 0
-    folder = format("folders/%s", var.parent_folder_id)
+    count = var.parent_folder_id != "" ? 1 : 0
+    folder = var.parent_folder_id
 }
 
 resource "google_project" "service_project" {
@@ -27,7 +27,7 @@ resource "google_project" "service_project" {
 
     name                = var.project_id
     project_id          = var.project_id
-    folder_id           = data.google_folder.parent_folder[0].id
+    folder_id           = var.parent_folder_id != "" ? data.google_folder.parent_folder[0].name : ""
     billing_account     = data.google_billing_account.acct[0].billing_account
     auto_create_network =  false
 
