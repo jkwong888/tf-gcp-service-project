@@ -43,7 +43,7 @@ variable "apis_to_enable" {
 }
 
 variable "skip_delete" {
-  default = true
+  default = "DELETE"
 }
 
 variable "shared_vpc_network" {

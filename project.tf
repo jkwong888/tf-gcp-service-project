@@ -31,7 +31,7 @@ resource "google_project" "service_project" {
     billing_account     = data.google_billing_account.acct[0].billing_account
     auto_create_network =  false
 
-    deletion_policy     = !var.skip_delete
+    deletion_policy     = var.skip_delete
 }
 
 data "google_project" "service_project" {
